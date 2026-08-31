@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Anar Manager — Pomegranate &amp; Drip Toolkit</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#241d14">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Anar Manager">
+<meta name="mobile-web-app-capable" content="yes">
+
+<style>
+  :root{
+    --soil-dark:#241d14;
+    --soil:#2e2417;
+    --soil-light:#3c3020;
+    --parchment:#ece2c8;
+    --parchment-dim:#c9bd9c;
+    --seed-red:#c1442d;
+    --seed-red-deep:#8a2c1f;
+    --rind-maroon:#7a1f2b;
+    --leaf:#7c8c4f;
+    --leaf-dim:#5c6a3a;
+    --ochre:#c88a3d;
+    --line:#4a3d28;
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --serif: Georgia, Cambria, "Times New Roman", serif;
+    --sans: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: "Courier New", Courier, monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 500px at 15% -10%, rgba(196,138,61,.08), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(122,31,43,.14), transparent 55%),
+      var(--soil-dark);
+    color:var(--parchment);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 18px 64px;}
+
+  /* ---------- HEADER ---------- */
+  header.top{
+    padding:34px 18px 22px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(122,31,43,.18), transparent);
+  }
+  .crest{display:flex;align-items:center;gap:16px;max-width:880px;margin:0 auto;}
+  .crest svg{flex:none;}
+  .crest h1{
+    font-family:var(--serif);
+    font-weight:700;
+    font-size:clamp(26px,5vw,36px);
+    margin:0;
+    letter-spacing:.3px;
+    color:var(--parchment);
+  }
+  .crest p{
+    margin:4px 0 0;
+    font-size:13.5px;
+    color:var(--parchment-dim);
+    letter-spacing:.4px;
+    text-transform:uppercase;
+  }
+  .offline-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    margin-top:14px;
+    font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;
+    color:var(--leaf);
+    border:1px solid var(--leaf-dim);
+    padding:5px 10px;border-radius:20px;
+    max-width:880px;
+  }
+  .offline-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--leaf);box-shadow:0 0 8px var(--leaf);}
+
+  /* ---------- TABS ---------- */
+  nav.tabs{
+    position:sticky;top:0;z-index:20;
+    display:flex;gap:2px;
+    background:var(--soil-dark);
+    border-bottom:1px solid var(--line);
+    padding:0 18px;
+    overflow-x:auto;
+  }
+  nav.tabs .inner{display:flex;gap:2px;max-width:880px;margin:0 auto;width:100%;}
+  .tab-btn{
+    appearance:none;border:none;background:transparent;
+    color:var(--parchment-dim);
+    font-family:var(--sans);font-size:14.5px;font-weight:600;
+    padding:16px 16px 13px;
+    cursor:pointer;white-space:nowrap;
+    border-bottom:3px solid transparent;
+    transition:color .15s ease, border-color .15s ease;
+  }
+  .tab-btn:hover{color:var(--parchment);}
+  .tab-btn.active{color:var(--ochre);border-bottom-color:var(--seed-red);}
+  .tab-panel{display:none;padding-top:26px;}
+  .tab-panel.active{display:block;animation:fadeUp .35s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  /* ---------- CARDS ---------- */
+  .card{
+    background:linear-gradient(180deg, var(--soil-light), var(--soil));
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px 20px 22px;
+    margin-bottom:18px;
+    box-shadow:var(--shadow);
+  }
+  .card h2{
+    font-family:var(--serif);
+    font-size:20px;margin:0 0 4px;color:var(--parchment);
+    display:flex;align-items:baseline;gap:9px;
+  }
+  .card h2 .eyebrow{
+    font-family:var(--mono);font-size:11px;color:var(--seed-red);
+    letter-spacing:1px;
+  }
+  .card .sub{color:var(--parchment-dim);font-size:13.5px;margin:0 0 16px;line-height:1.5;}
+  .card h3{font-family:var(--serif);font-size:15.5px;color:var(--ochre);margin:18px 0 8px;}
+  p, li{line-height:1.62;font-size:14.5px;color:#ddd3ba;}
+  ul{margin:6px 0;padding-left:20px;}
+  li{margin-bottom:5px;}
+  .note{
+    font-size:12.5px;color:var(--parchment-dim);
+    border-left:3px solid var(--ochre);
+    padding:8px 12px;background:rgba(200,138,61,.07);
+    border-radius:0 6px 6px 0;margin-top:14px;
+  }
+  strong{color:var(--parchment);}
+
+  /* ---------- TABLES ---------- */
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;}
+  th,td{padding:9px 8px;text-align:left;border-bottom:1px solid var(--line);}
+  th{color:var(--ochre);font-weight:600;font-family:var(--sans);font-size:12px;text-transform:uppercase;letter-spacing:.4px;}
+  td{color:#ddd3ba;}
+  tr:last-child td{border-bottom:none;}
+  .num{font-family:var(--mono);color:var(--parchment);}
+
+  /* ---------- CALCULATOR ---------- */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:520px){.grid2{grid-template-columns:1fr;}}
+  label{display:block;font-size:12px;color:var(--parchment-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+  select,input[type=number],input[type=text],input[type=date]{
+    width:100%;background:var(--soil-dark);
+    border:1px solid var(--line);color:var(--parchment);
+    padding:10px 11px;border-radius:6px;font-size:14.5px;font-family:var(--sans);
+  }
+  select:focus,input:focus{outline:2px solid var(--seed-red);outline-offset:1px;}
+  .field{margin-bottom:14px;}
+  .calc-btn{
+    margin-top:6px;
+    background:var(--seed-red);color:#fff;border:none;
+    padding:12px 18px;border-radius:7px;font-weight:700;font-size:14.5px;
+    cursor:pointer;letter-spacing:.3px;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .calc-btn:hover{background:var(--seed-red-deep);}
+  .calc-btn:active{transform:scale(.98);}
+  .calc-btn:focus-visible{outline:2px solid var(--ochre);outline-offset:2px;}
+
+  /* result / gauge */
+  .result{
+    margin-top:22px;padding-top:20px;border-top:1px dashed var(--line);
+    display:flex;gap:24px;align-items:center;flex-wrap:wrap;
+  }
+  .gauge-wrap{flex:none;text-align:center;}
+  .gauge-wrap .g-label{font-size:11px;color:var(--parchment-dim);text-transform:uppercase;letter-spacing:.5px;margin-top:4px;}
+  .stat-list{flex:1;min-width:220px;}
+  .stat-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px;}
+  .stat-row:last-child{border-bottom:none;}
+  .stat-row .k{color:var(--parchment-dim);}
+  .stat-row .v{font-family:var(--mono);color:var(--ochre);font-weight:700;}
+
+  /* ---------- LOG ---------- */
+  .log-form{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;}
+  @media(max-width:640px){.log-form{grid-template-columns:1fr 1fr;}}
+  .add-btn{
+    background:var(--leaf);color:#1b1b10;border:none;font-weight:700;
+    padding:10px 16px;border-radius:6px;cursor:pointer;height:41px;
+  }
+  .add-btn:hover{background:#8f9f5c;}
+  .log-empty{color:var(--parchment-dim);font-size:13.5px;padding:18px 0;text-align:center;border:1px dashed var(--line);border-radius:8px;margin-top:14px;}
+  .del-btn{background:none;border:none;color:var(--seed-red);cursor:pointer;font-size:13px;font-family:var(--sans);}
+  .del-btn:hover{text-decoration:underline;}
+  .log-actions{display:flex;gap:10px;margin-top:14px;}
+  .ghost-btn{
+    background:transparent;border:1px solid var(--line);color:var(--parchment-dim);
+    padding:8px 14px;border-radius:6px;font-size:13px;cursor:pointer;
+  }
+  .ghost-btn:hover{border-color:var(--ochre);color:var(--ochre);}
+
+  footer{text-align:center;color:var(--parchment-dim);font-size:12px;padding:30px 18px 10px;line-height:1.7;}
+
+  @media print{
+    nav.tabs,.calc-btn,.log-form,.log-actions,.offline-pill{display:none!important;}
+    body{background:#fff;color:#000;}
+    .card{background:#fff;border:1px solid #999;box-shadow:none;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .tab-panel.active{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="crest">
+    <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
+      <circle cx="23" cy="25" r="17" fill="#7a1f2b"/>
+      <path d="M23 5 L18 11 L28 11 Z" fill="#c88a3d"/>
+      <path d="M17 8 Q23 2 29 8" stroke="#c88a3d" stroke-width="2" fill="none"/>
+      <circle cx="17" cy="22" r="2.4" fill="#ece2c8"/>
+      <circle cx="24" cy="18" r="2.4" fill="#ece2c8"/>
+      <circle cx="29" cy="24" r="2.4" fill="#ece2c8"/>
+      <circle cx="19" cy="30" r="2.4" fill="#ece2c8"/>
+      <circle cx="27" cy="31" r="2.4" fill="#ece2c8"/>
+    </svg>
+    <div>
+      <h1>Anar Manager</h1>
+      <p>Pomegranate Orchard &amp; Drip Irrigation Toolkit</p>
+    </div>
+  </div>
+  <span class="offline-pill">Works fully offline — no internet needed once opened</span>
+</header>
+
+<nav class="tabs">
+  <div class="inner">
+    <button class="tab-btn active" data-tab="guide">Grow Guide</button>
+    <button class="tab-btn" data-tab="drip">Drip Calculator</button>
+    <button class="tab-btn" data-tab="log">Irrigation Log</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ============ TAB 1: GROW GUIDE ============ -->
+  <section class="tab-panel active" id="tab-guide">
+
+    <div class="card">
+      <h2><span class="eyebrow">01</span> Site, Soil &amp; Climate</h2>
+      <p class="sub">What an anar orchard needs to establish well and bear reliably.</p>
+      <ul>
+        <li><strong>Climate:</strong> Semi-arid, with a hot dry summer and a mild winter. Tolerates temperatures from near-freezing to over 45°C, but fruit cracking increases with high humidity near harvest.</li>
+        <li><strong>Soil:</strong> Deep, well-drained loam is ideal. Pomegranate tolerates poor and moderately saline/alkaline soils better than most fruit crops, but waterlogging quickly causes root rot — drainage matters more than fertility.</li>
+        <li><strong>Soil pH:</strong> 6.5 – 7.5 preferred; can tolerate up to ~8.5 with management.</li>
+        <li><strong>Water:</strong> Low overall demand compared to other orchard crops, which is why drip irrigation suits it so well — but it still needs consistent moisture during fruit development to prevent cracking and fruit drop.</li>
+      </ul>
+      <div class="note">Get a soil test before planting if possible — it decides pit preparation, gypsum/lime needs, and your real fertilizer dose far better than any general guide.</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="eyebrow">02</span> Planting</h2>
+      <ul>
+        <li><strong>Spacing:</strong> 4.5m × 3m to 5m × 5m depending on variety and mechanization needs. Closer spacing (4m×2m, "high density") is used in some intensive orchards but demands tighter canopy management.</li>
+        <li><strong>Pit size:</strong> 60cm × 60cm × 60cm, dug and left open to weather for 2–3 weeks before filling.</li>
+        <li><strong>Pit mix:</strong> Top soil + well-rotted farmyard manure (FYM) + a handful of single super phosphate, refilled and watered before transplanting.</li>
+        <li><strong>Best planting window:</strong> Onset of monsoon, or spring (Feb–Mar) where irrigation is assured.</li>
+        <li><strong>Common varieties:</strong> Bhagwa, Ganesh, Arakta, Mridula, Ruby — Bhagwa dominates commercial export-oriented planting for its deep red rind and arils.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="eyebrow">03</span> Fertilizer Calendar <span style="font-weight:400;color:var(--parchment-dim);font-size:13px;">(indicative, per plant/year)</span></h2>
+      <p class="sub">Typical split-dose schedule used across three growth phases. Adjust to your soil test and local Package-of-Practices (PoP) advisory.</p>
+      <table>
+        <tr><th>Stage</th><th>FYM</th><th>N</th><th>P</th><th>K</th><th>Timing</th></tr>
+        <tr><td>Year 1</td><td class="num">10 kg</td><td class="num">50 g</td><td class="num">50 g</td><td class="num">50 g</td><td>2 split doses — post-monsoon &amp; late winter</td></tr>
+        <tr><td>Year 2</td><td class="num">20 kg</td><td class="num">125 g</td><td class="num">125 g</td><td class="num">125 g</td><td>3 split doses across the year</td></tr>
+        <tr><td>Year 3+ (bearing)</td><td class="num">25–50 kg</td><td class="num">250–625 g</td><td class="num">125–250 g</td><td class="num">125–250 g</td><td>Split around pruning, fruit-set &amp; fruit development</td></tr>
+      </table>
+      <div class="note">Ranges widen in bearing years because dose scales with canopy size and expected yield/bahar (flowering cycle). Treat this as a starting point, not a prescription.</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="eyebrow">04</span> Pruning &amp; Training</h2>
+      <ul>
+        <li><strong>Years 1–2:</strong> Train to an open, multi-stem bush of 4–5 well-spaced scaffold branches. Remove all growth below 30–45cm from ground level.</li>
+        <li><strong>Every year after:</strong> Remove root suckers and water shoots regularly — pomegranate throws these constantly and they drain vigor from fruiting wood.</li>
+        <li><strong>Post-harvest pruning:</strong> Light annual pruning to remove dead, crossing, and diseased wood, and to open the canopy for light and spray penetration.</li>
+        <li><strong>Bahar treatment:</strong> Many growers control flowering with a rest-then-irrigate cycle (withholding water, then resuming) to time a specific flowering/harvest window — a technique worth learning from local growers before attempting.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span class="eyebrow">05</span> Pests &amp; Disease Watch</h2>
+      <ul>
+        <li><strong>Bacterial blight (Xanthomonas):</strong> The single biggest threat to pomegranate — leaf and fruit spotting, cracking. Manage with copper-based sprays, sanitation, and resistant/tolerant planting material; avoid overhead irrigation which spreads it.</li>
+        <li><strong>Fruit borer:</strong> Causes internal fruit damage. Use pheromone traps for monitoring, and fruit bagging in high-value orchards.</li>
+        <li><strong>Aphids &amp; thrips:</strong> Sap-suckers on new growth and flowers; neem-based sprays for low pressure, need-based insecticide for outbreaks.</li>
+        <li><strong>Anthracnose:</strong> Fungal fruit rot, worse in humid/monsoon periods — fungicide spray program during flowering and fruit-set helps.</li>
+      </ul>
+      <div class="note">Always confirm chemical choice, dose and pre-harvest interval with your local agricultural extension office — recommendations vary by region and regulation.</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="eyebrow">06</span> Harvest Signs</h2>
+      <ul>
+        <li>5–7 months from fruit set to maturity, depending on variety and bahar season.</li>
+        <li>Rind changes to the variety's mature colour (deep red/golden-red for Bhagwa) and turns tight, glossy, and slightly angular in cross-section.</li>
+        <li>A ripe fruit gives a dull, metallic sound when tapped — a hollow-sounding fruit is usually underripe.</li>
+        <li>Harvest by clipping (not pulling) to avoid tearing the crown and stem.</li>
+      </ul>
+    </div>
+
+  </section>
+
+  <!-- ============ TAB 2: DRIP CALCULATOR ============ -->
+  <section class="tab-panel" id="tab-drip">
+
+    <div class="card">
+      <h2><span class="eyebrow">CALC</span> Daily Drip Water Requirement</h2>
+      <p class="sub">A field-level estimate — not a precision agronomic model. Use it to set a starting irrigation duration, then fine-tune by watching soil moisture and plant response.</p>
+
+      <div class="grid2">
+        <div class="field">
+          <label for="stage">Plant stage</label>
+          <select id="stage">
+            <option value="5">Year 1 (establishment)</option>
+            <option value="10">Year 2 (young growth)</option>
+            <option value="15">Year 3 (pre-bearing)</option>
+            <option value="20">Year 4–5 (early bearing)</option>
+            <option value="30" selected>Year 6+ (full bearing)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="soil">Soil type</label>
+          <select id="soil">
+            <option value="1.2">Sandy / light</option>
+            <option value="1.0" selected>Loamy / medium</option>
+            <option value="0.85">Clay / heavy</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="season">Season</label>
+          <select id="season">
+            <option value="1.3">Summer (peak demand)</option>
+            <option value="0.8" selected>Winter (moderate)</option>
+            <option value="0.4">Monsoon (rain-assisted)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="plants">Number of plants</label>
+          <input type="number" id="plants" value="100" min="1">
+        </div>
+        <div class="field">
+          <label for="emitters">Emitters (drippers) per plant</label>
+          <input type="number" id="emitters" value="2" min="1">
+        </div>
+        <div class="field">
+          <label for="lph">Emitter discharge rate (litres/hour)</label>
+          <input type="number" id="lph" value="4" min="0.5" step="0.5">
+        </div>
+      </div>
+
+      <button class="calc-btn" onclick="calcDrip()">Calculate irrigation run time</button>
+
+      <div class="result" id="dripResult" style="display:none;">
+        <div class="gauge-wrap">
+          <svg width="150" height="150" viewBox="0 0 150 150">
+            <circle cx="75" cy="75" r="62" fill="none" stroke="#3c3020" stroke-width="14"/>
+            <circle id="gaugeArc" cx="75" cy="75" r="62" fill="none" stroke="#c1442d" stroke-width="14"
+                    stroke-linecap="round" transform="rotate(-90 75 75)"
+                    stroke-dasharray="0 389.6"/>
+            <text id="gaugeNum" x="75" y="70" text-anchor="middle" font-family="Courier New" font-size="26" fill="#ece2c8" font-weight="bold">0</text>
+            <text x="75" y="90" text-anchor="middle" font-family="Segoe UI" font-size="11" fill="#c9bd9c">MIN / DAY</text>
+          </svg>
+          <div class="g-label">Per-plant run time</div>
+        </div>
+        <div class="stat-list">
+          <div class="stat-row"><span class="k">Water per plant / day</span><span class="v" id="rPerPlant">–</span></div>
+          <div class="stat-row"><span class="k">Total orchard water / day</span><span class="v" id="rTotal">–</span></div>
+          <div class="stat-row"><span class="k">Run time per plant</span><span class="v" id="rTime">–</span></div>
+          <div class="stat-row"><span class="k">System discharge required</span><span class="v" id="rDischarge">–</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="eyebrow">DESIGN</span> Quick System Design Notes</h2>
+      <ul>
+        <li><strong>Emitters per plant:</strong> 2 for young plants, 4–6 online drippers arranged around the drip line once the canopy matures, so the wetted zone tracks the root spread.</li>
+        <li><strong>Lateral spacing:</strong> Match to plant row spacing — one lateral per row is standard for single-row planting.</li>
+        <li><strong>Filtration:</strong> Always run a screen or disc filter before the laterals — pomegranate drippers clog easily with silt or algae, and blight spreads faster from uneven watering caused by clogged emitters.</li>
+        <li><strong>Flush laterals</strong> monthly, and check the tail end of each line for pressure drop.</li>
+        <li><strong>Fertigation:</strong> Water-soluble fertilizer can be injected through the same drip system to fold feeding into your irrigation routine — venturi or fertilizer tank injectors are the common low-cost options.</li>
+      </ul>
+    </div>
+
+  </section>
+
+  <!-- ============ TAB 3: LOG ============ -->
+  <section class="tab-panel" id="tab-log">
+    <div class="card">
+      <h2><span class="eyebrow">LOG</span> Irrigation Record</h2>
+      <p class="sub">Keep a running log of what you actually ran, block by block. This resets when the page is closed — it's a session worksheet, not permanent storage, so print or note down anything you want to keep.</p>
+
+      <div class="log-form">
+        <div class="field" style="margin-bottom:0;">
+          <label for="logDate">Date</label>
+          <input type="date" id="logDate">
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="logBlock">Block / plot</label>
+          <input type="text" id="logBlock" placeholder="e.g. North block">
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="logMinutes">Duration (min)</label>
+          <input type="number" id="logMinutes" min="1" placeholder="45">
+        </div>
+        <button class="add-btn" onclick="addLog()">Add entry</button>
+      </div>
+
+      <div id="logTableWrap"></div>
+      <div id="logEmpty" class="log-empty">No entries yet — add your first irrigation run above.</div>
+
+      <div class="log-actions">
+        <button class="ghost-btn" onclick="window.print()">Print log</button>
+        <button class="ghost-btn" onclick="clearLog()">Clear all</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Figures throughout are general field guidance, not a substitute for a soil test or your local agricultural<br>
+  extension advisory. Nothing here is stored on any server — everything runs in this page, in your browser.
+</footer>
+
+<script>
+  // ---------- TABS ----------
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ---------- DRIP CALCULATOR ----------
+  function calcDrip(){
+    const base = parseFloat(document.getElementById('stage').value);
+    const soilMult = parseFloat(document.getElementById('soil').value);
+    const seasonMult = parseFloat(document.getElementById('season').value);
+    const plants = Math.max(1, parseFloat(document.getElementById('plants').value) || 1);
+    const emitters = Math.max(1, parseFloat(document.getElementById('emitters').value) || 1);
+    const lph = Math.max(0.1, parseFloat(document.getElementById('lph').value) || 1);
+
+    const perPlantLitres = base * soilMult * seasonMult;
+    const totalLitres = perPlantLitres * plants;
+    const dischargePerPlant = emitters * lph; // L/hr
+    const runHours = perPlantLitres / dischargePerPlant;
+    const runMinutes = runHours * 60;
+    const systemDischargeLPH = plants * dischargePerPlant;
+    const systemDischargeLPM = systemDischargeLPH / 60;
+
+    document.getElementById('rPerPlant').textContent = perPlantLitres.toFixed(1) + ' L';
+    document.getElementById('rTotal').textContent = totalLitres.toFixed(0) + ' L';
+    document.getElementById('rTime').textContent = runMinutes.toFixed(0) + ' min';
+    document.getElementById('rDischarge').textContent = systemDischargeLPH.toFixed(0) + ' L/hr (' + systemDischargeLPM.toFixed(1) + ' L/min)';
+
+    document.getElementById('gaugeNum').textContent = runMinutes.toFixed(0);
+    const circumference = 2 * Math.PI * 62; // ~389.6
+    const capped = Math.min(runMinutes, 120); // gauge maxes visually at 120 min
+    const arcLen = (capped/120) * circumference;
+    document.getElementById('gaugeArc').setAttribute('stroke-dasharray', arcLen.toFixed(1) + ' ' + circumference.toFixed(1));
+
+    document.getElementById('dripResult').style.display = 'flex';
+  }
+
+  // ---------- IRRIGATION LOG (in-memory only, no storage) ----------
+  let logEntries = [];
+
+  function addLog(){
+    const date = document.getElementById('logDate').value;
+    const block = document.getElementById('logBlock').value.trim();
+    const minutes = document.getElementById('logMinutes').value;
+
+    if(!date || !block || !minutes){
+      alert('Fill in date, block, and duration before adding.');
+      return;
+    }
+
+    logEntries.push({date, block, minutes: parseFloat(minutes)});
+    document.getElementById('logBlock').value = '';
+    document.getElementById('logMinutes').value = '';
+    renderLog();
+  }
+
+  function removeLog(index){
+    logEntries.splice(index,1);
+    renderLog();
+  }
+
+  function clearLog(){
+    if(logEntries.length && !confirm('Clear all logged entries?')) return;
+    logEntries = [];
+    renderLog();
+  }
+
+  function renderLog(){
+    const wrap = document.getElementById('logTableWrap');
+    const empty = document.getElementById('logEmpty');
+    if(logEntries.length === 0){
+      wrap.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    const sorted = [...logEntries].sort((a,b)=> a.date < b.date ? 1 : -1);
+    let totalMin = 0;
+    let rows = sorted.map(e=>{
+      totalMin += e.minutes;
+      const realIdx = logEntries.indexOf(e);
+      return `<tr>
+        <td>${e.date}</td>
+        <td>${e.block}</td>
+        <td class="num">${e.minutes} min</td>
+        <td><button class="del-btn" onclick="removeLog(${realIdx})">remove</button></td>
+      </tr>`;
+    }).join('');
+
+    wrap.innerHTML = `<table>
+      <tr><th>Date</th><th>Block</th><th>Duration</th><th></th></tr>
+      ${rows}
+      <tr><td colspan="2" style="color:var(--ochre);font-weight:700;">Total logged</td><td class="num" style="color:var(--ochre);font-weight:700;">${totalMin} min</td><td></td></tr>
+    </table>`;
+  }
+
+  // default date = today
+  document.getElementById('logDate').valueAsDate = new Date();
+
+  // ---------- PWA: register service worker (only works when served, not on file://) ----------
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+    });
+  }
+</script>
+
+</body>
+</html>

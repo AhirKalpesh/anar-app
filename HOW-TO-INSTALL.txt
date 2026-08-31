@@ -1,0 +1,54 @@
+ANAR MANAGER — INSTALL ON YOUR PHONE
+=====================================
+
+This folder is a small installable app (a "PWA"). It has two ways to use it,
+depending on how much setup you want to do.
+
+--------------------------------------------------------------------
+OPTION A — Fastest, works immediately, no hosting needed
+--------------------------------------------------------------------
+1. Copy index.html onto your phone (via USB, WhatsApp/email to yourself,
+   Google Drive, Bluetooth — any method).
+2. Open it in Chrome (Android) or Safari (iPhone).
+3. Tap the browser menu (⋮ on Android, share icon on iPhone) and choose
+   "Add to Home screen".
+4. You'll get an app icon on your home screen that opens the tool directly.
+
+This works fully offline right away. The only limitation: because it's
+opened as a local file, the app icon may still show a thin browser bar,
+and the service worker (advanced offline caching) won't activate — but
+you don't need it, since the whole app is already one self-contained
+file with nothing to fetch from the internet.
+
+--------------------------------------------------------------------
+OPTION B — Full app experience (no browser bar, real "Install" prompt)
+--------------------------------------------------------------------
+This needs the app served from a real web address once. After that,
+it installs like a normal app and works offline forever.
+
+Easiest free way — GitHub Pages (no coding needed):
+1. Create a free GitHub account if you don't have one.
+2. Create a new repository, upload ALL the files in this folder
+   (index.html, manifest.json, service-worker.js, and the icon-*.png files).
+3. In the repo settings, turn on "GitHub Pages" for the main branch.
+4. Visit the link GitHub gives you, on your phone, in Chrome or Safari.
+5. Chrome will show an "Install app" prompt automatically (or menu ⋮ →
+   "Install app"). Safari: share icon → "Add to Home Screen".
+6. From then on, it opens like a native app and works offline —
+   the service worker caches everything on first visit.
+
+Any other static host works the same way (Netlify, Vercel, Cloudflare
+Pages) — just drag-and-drop this folder in.
+
+--------------------------------------------------------------------
+FILES IN THIS PACKAGE
+--------------------------------------------------------------------
+index.html              - the app itself (guide, drip calculator, log)
+manifest.json           - app name, icon, colors for installability
+service-worker.js       - caches the app so it works fully offline
+icon-192.png / icon-512.png / icon-512-maskable.png / icon-180.png
+                         - app icons for Android and iPhone home screens
+
+Nothing here contacts a server or collects data — it's the same
+offline tool as before, just packaged so your phone can treat it
+as an app instead of a document.
