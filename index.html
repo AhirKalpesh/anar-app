@@ -138,6 +138,8 @@
   strong{color:var(--parchment);}
 
   /* ---------- TABLES ---------- */
+  #logTableWrap{overflow-x:auto;}
+  #logTableWrap table{min-width:560px;}
   table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;}
   th,td{padding:9px 8px;text-align:left;border-bottom:1px solid var(--line);}
   th{color:var(--ochre);font-weight:600;font-family:var(--sans);font-size:12px;text-transform:uppercase;letter-spacing:.4px;}
@@ -181,14 +183,30 @@
   .stat-row .v{font-family:var(--mono);color:var(--ochre);font-weight:700;}
 
   /* ---------- LOG ---------- */
-  .log-form{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end;}
-  @media(max-width:640px){.log-form{grid-template-columns:1fr 1fr;}}
+  .log-form{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:10px;align-items:end;}
+  @media(max-width:680px){.log-form{grid-template-columns:1fr 1fr;}}
   .add-btn{
     background:var(--leaf);color:#1b1b10;border:none;font-weight:700;
     padding:10px 16px;border-radius:6px;cursor:pointer;height:41px;
   }
   .add-btn:hover{background:#8f9f5c;}
   .log-empty{color:var(--parchment-dim);font-size:13.5px;padding:18px 0;text-align:center;border:1px dashed var(--line);border-radius:8px;margin-top:14px;}
+
+  /* ---------- TIMER ---------- */
+  .timer-clock{
+    font-family:var(--mono);font-size:52px;color:var(--ochre);
+    text-align:center;letter-spacing:2px;margin-top:18px;font-weight:bold;
+  }
+  .timer-sub{text-align:center;color:var(--parchment-dim);font-size:13.5px;margin:2px 0 16px;}
+  #timerActive{text-align:center;}
+  .timer-alert{
+    background:rgba(193,68,45,.16);border:1px solid var(--seed-red);
+    border-radius:8px;padding:18px;text-align:center;margin-top:16px;
+    animation:pulse 1.4s ease-in-out infinite;
+  }
+  .timer-alert div{font-size:16.5px;margin-bottom:12px;color:var(--parchment);font-weight:700;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 rgba(193,68,45,.4);}50%{box-shadow:0 0 18px rgba(193,68,45,.5);}}
+  @media (prefers-reduced-motion: reduce){.timer-alert{animation:none;}}
   .del-btn{background:none;border:none;color:var(--seed-red);cursor:pointer;font-size:13px;font-family:var(--sans);}
   .del-btn:hover{text-decoration:underline;}
   .log-actions{display:flex;gap:10px;margin-top:14px;}
@@ -400,9 +418,12 @@
 
   <!-- ============ TAB 3: LOG ============ -->
   <section class="tab-panel" id="tab-log">
-    <div class="card">
-      <h2><span class="eyebrow">LOG</span> Irrigation Record</h2>
-      <p class="sub">Keep a running log of what you actually ran, block by block. This resets when the page is closed — it's a session worksheet, not permanent storage, so print or note down anything you want to keep.</p>
+
+    <div class="card" id="timerCard">
+      <h2><span class="eyebrow">RUN</span> Start Irrigation</h2>
+      <p class="sub">Fill this in once. It starts a countdown for the valve and logs the run at the same time — you'll get a sound and on-screen alert here when it's time to switch.</p>
+
+      <div id="notifRow" style="margin-bottom:16px;"></div>
 
       <div class="log-form">
         <div class="field" style="margin-bottom:0;">
@@ -414,10 +435,40 @@
           <input type="text" id="logBlock" placeholder="e.g. North block">
         </div>
         <div class="field" style="margin-bottom:0;">
-          <label for="logMinutes">Duration (min)</label>
-          <input type="number" id="logMinutes" min="1" placeholder="45">
+          <label for="logValveTime">Valve &amp; duration</label>
+          <input type="text" id="logValveTime" placeholder="e.g. Valve 2, 45">
         </div>
-        <button class="add-btn" onclick="addLog()">Add entry</button>
+        <div class="field" style="margin-bottom:0;">
+          <label for="logVolume">Volume (L)</label>
+          <input type="number" id="logVolume" min="0" step="1" placeholder="optional">
+        </div>
+      </div>
+
+      <div id="timerIdle" style="margin-top:14px;">
+        <button class="calc-btn" onclick="startAndLog()">Start timer &amp; log entry</button>
+      </div>
+
+      <div id="timerActive" style="display:none;">
+        <div class="timer-clock" id="timerClock">00:00</div>
+        <div class="timer-sub" id="timerRunningLabel"></div>
+        <button class="ghost-btn" onclick="stopTimer()">Stop timer</button>
+      </div>
+
+      <div id="timerDone" class="timer-alert" style="display:none;">
+        <div>⏰ <span id="timerDoneLabel"></span> — time to switch the valve</div>
+        <button class="calc-btn" onclick="restartTimer()">Restart same timer</button>
+        <button class="ghost-btn" onclick="dismissAlarm()" style="margin-top:8px;">Dismiss</button>
+      </div>
+
+      <div class="note">Keep this tab open and the screen unlocked for the most reliable alert — mobile browsers slow down timers running in the background. If you need a guaranteed wake-up while doing something else, pair this with a phone alarm as backup.</div>
+    </div>
+
+    <div class="card">
+      <h2><span class="eyebrow">LOG</span> Irrigation Record</h2>
+      <p class="sub">Every run you start above is logged here automatically. Entries are saved on this device and stay put between visits — clearing your browser data will remove them, so print or export anything you want to keep long-term.</p>
+
+      <div id="storageWarning" class="note" style="display:none;border-left-color:var(--seed-red);color:var(--parchment);">
+        This browser isn't letting the app save entries between visits — they'll disappear if you close the app. Tap <strong>Export</strong> below before closing to keep a copy, then <strong>Import</strong> it next time. This usually happens when the app is opened as a bare file — installing it via a hosted link (see HOW-TO-INSTALL.txt, Option B) fixes it for good.
       </div>
 
       <div id="logTableWrap"></div>
@@ -425,7 +476,10 @@
 
       <div class="log-actions">
         <button class="ghost-btn" onclick="window.print()">Print log</button>
+        <button class="ghost-btn" onclick="exportLog()">Export</button>
+        <button class="ghost-btn" onclick="triggerImport()">Import</button>
         <button class="ghost-btn" onclick="clearLog()">Clear all</button>
+        <input type="file" id="importFile" accept="application/json,.json" style="display:none" onchange="importLog(event)">
       </div>
     </div>
   </section>
@@ -479,33 +533,157 @@
     document.getElementById('dripResult').style.display = 'flex';
   }
 
-  // ---------- IRRIGATION LOG (in-memory only, no storage) ----------
-  let logEntries = [];
+  // ---------- IRRIGATION LOG (persisted to this device via localStorage) ----------
+  const LOG_KEY = 'anarManagerLogEntries';
 
-  function addLog(){
+  function storageWorks(){
+    try{
+      const testKey = '__anar_storage_test__';
+      localStorage.setItem(testKey, '1');
+      const ok = localStorage.getItem(testKey) === '1';
+      localStorage.removeItem(testKey);
+      return ok;
+    }catch(e){
+      return false;
+    }
+  }
+
+  const STORAGE_OK = storageWorks();
+
+  function loadLog(){
+    try{
+      const raw = localStorage.getItem(LOG_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){
+      return [];
+    }
+  }
+
+  function saveLog(){
+    try{
+      localStorage.setItem(LOG_KEY, JSON.stringify(logEntries));
+    }catch(e){
+      // storage unavailable (private browsing, etc.) — log still works for this session
+    }
+  }
+
+  let logEntries = loadLog();
+
+  function exportLog(){
+    const blob = new Blob([JSON.stringify(logEntries, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const stamp = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = 'anar-irrigation-log-' + stamp + '.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function triggerImport(){
+    document.getElementById('importFile').click();
+  }
+
+  function importLog(event){
+    const file = event.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        const imported = JSON.parse(reader.result);
+        if(!Array.isArray(imported)) throw new Error('not an array');
+        logEntries = logEntries.concat(imported);
+        saveLog();
+        renderLog();
+        alert('Imported ' + imported.length + ' entries.');
+      }catch(e){
+        alert('Could not read that file — make sure it\'s a log exported from this app.');
+      }
+      event.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  // Parses combined input like "Valve 2, 45" or "Valve 2, 45 min" or "Valve 2 45"
+  function parseValveDuration(raw){
+    if(!raw) return {valve:'', minutes:NaN};
+    raw = raw.trim();
+    if(raw.includes(',')){
+      const idx = raw.indexOf(',');
+      const valve = raw.slice(0, idx).trim();
+      const rest = raw.slice(idx + 1);
+      const m = rest.match(/(-?\d+(\.\d+)?)/);
+      return {valve, minutes: m ? parseFloat(m[1]) : NaN};
+    }
+    const m = raw.match(/^(.*?)[\s]+(-?\d+(\.\d+)?)\s*(min|minutes|m)?\s*$/i);
+    if(m) return {valve: m[1].trim(), minutes: parseFloat(m[2])};
+    return {valve: raw, minutes: NaN};
+  }
+
+  let lastRun = null;
+
+  function startAndLog(){
     const date = document.getElementById('logDate').value;
     const block = document.getElementById('logBlock').value.trim();
-    const minutes = document.getElementById('logMinutes').value;
+    const volumeRaw = document.getElementById('logVolume').value;
+    const { valve, minutes } = parseValveDuration(document.getElementById('logValveTime').value);
 
-    if(!date || !block || !minutes){
-      alert('Fill in date, block, and duration before adding.');
+    if(!date || !block || !valve || isNaN(minutes) || minutes <= 0){
+      alert('Fill in date, block, and "Valve, duration" (e.g. "Valve 2, 45") before starting.');
       return;
     }
 
-    logEntries.push({date, block, minutes: parseFloat(minutes)});
-    document.getElementById('logBlock').value = '';
-    document.getElementById('logMinutes').value = '';
+    // log the entry
+    logEntries.push({
+      date, block, valve,
+      minutes,
+      volume: volumeRaw ? parseFloat(volumeRaw) : null
+    });
+    saveLog();
     renderLog();
+
+    // remember this run so it can be restarted with one tap later
+    lastRun = { block, valve, minutes, volumeRaw };
+
+    // start the countdown for the same run
+    const label = block + (valve ? ' – ' + valve : '');
+    if('Notification' in window && Notification.permission === 'default'){
+      Notification.requestPermission().then(() => { if(typeof renderNotifRow==='function') renderNotifRow(); });
+    }
+    const endTime = Date.now() + minutes * 60000;
+    saveTimer({label, endTime});
+    runTimer(label, endTime);
+
+    // clear the entry fields, keep date as-is for the next run
+    document.getElementById('logBlock').value = '';
+    document.getElementById('logValveTime').value = '';
+    document.getElementById('logVolume').value = '';
+  }
+
+  function restartTimer(){
+    if(!lastRun){
+      dismissAlarm();
+      return;
+    }
+    document.getElementById('logDate').valueAsDate = new Date();
+    document.getElementById('logBlock').value = lastRun.block;
+    document.getElementById('logValveTime').value = lastRun.valve + ', ' + lastRun.minutes;
+    document.getElementById('logVolume').value = lastRun.volumeRaw || '';
+    startAndLog();
   }
 
   function removeLog(index){
     logEntries.splice(index,1);
+    saveLog();
     renderLog();
   }
 
   function clearLog(){
     if(logEntries.length && !confirm('Clear all logged entries?')) return;
     logEntries = [];
+    saveLog();
     renderLog();
   }
 
@@ -521,26 +699,199 @@
 
     const sorted = [...logEntries].sort((a,b)=> a.date < b.date ? 1 : -1);
     let totalMin = 0;
+    let totalVol = 0;
     let rows = sorted.map(e=>{
       totalMin += e.minutes;
+      totalVol += e.volume || 0;
       const realIdx = logEntries.indexOf(e);
       return `<tr>
         <td>${e.date}</td>
         <td>${e.block}</td>
+        <td>${e.valve || '—'}</td>
         <td class="num">${e.minutes} min</td>
+        <td class="num">${e.volume != null ? e.volume + ' L' : '—'}</td>
         <td><button class="del-btn" onclick="removeLog(${realIdx})">remove</button></td>
       </tr>`;
     }).join('');
 
     wrap.innerHTML = `<table>
-      <tr><th>Date</th><th>Block</th><th>Duration</th><th></th></tr>
+      <tr><th>Date</th><th>Block</th><th>Valve</th><th>Duration</th><th>Volume</th><th></th></tr>
       ${rows}
-      <tr><td colspan="2" style="color:var(--ochre);font-weight:700;">Total logged</td><td class="num" style="color:var(--ochre);font-weight:700;">${totalMin} min</td><td></td></tr>
+      <tr>
+        <td colspan="3" style="color:var(--ochre);font-weight:700;">Total logged</td>
+        <td class="num" style="color:var(--ochre);font-weight:700;">${totalMin} min</td>
+        <td class="num" style="color:var(--ochre);font-weight:700;">${totalVol ? totalVol + ' L' : '—'}</td>
+        <td></td>
+      </tr>
     </table>`;
   }
 
   // default date = today
   document.getElementById('logDate').valueAsDate = new Date();
+  renderLog();
+  if(!STORAGE_OK){
+    document.getElementById('storageWarning').style.display = 'block';
+  }
+
+  // ---------- NOTIFICATION PERMISSION ----------
+  function renderNotifRow(){
+    const row = document.getElementById('notifRow');
+    if(!('Notification' in window)){
+      row.innerHTML = '<div class="note" style="margin-top:0;">This browser doesn\'t support alert notifications — the on-screen alarm, sound, and vibration will still work.</div>';
+      return;
+    }
+    if(Notification.permission === 'granted'){
+      row.innerHTML = '<div class="note" style="margin-top:0;color:var(--leaf);border-left-color:var(--leaf);">Notifications are on — you\'ll get an alert even if you\'ve switched apps.</div>';
+    }else if(Notification.permission === 'denied'){
+      row.innerHTML = '<div class="note" style="margin-top:0;">Notifications are blocked in this browser\'s settings. The on-screen alarm, sound, and vibration will still fire when the app is open.</div>';
+    }else{
+      row.innerHTML = '<button class="ghost-btn" type="button" onclick="enableNotifications()">Enable notifications</button>';
+    }
+  }
+
+  function enableNotifications(){
+    if(!('Notification' in window)) return;
+    Notification.requestPermission().then(renderNotifRow);
+  }
+
+  renderNotifRow();
+
+  // ---------- VALVE TIMER ----------
+  const TIMER_KEY = 'anarManagerTimer';
+  let timerInterval = null;
+  let alarmInterval = null;
+  let audioCtx = null;
+
+  function beep(){
+    try{
+      if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.35, audioCtx.currentTime + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.55);
+    }catch(e){ /* audio unavailable */ }
+  }
+
+  function saveTimer(state){
+    try{
+      if(state) localStorage.setItem(TIMER_KEY, JSON.stringify(state));
+      else localStorage.removeItem(TIMER_KEY);
+    }catch(e){}
+  }
+
+  function loadTimer(){
+    try{
+      const raw = localStorage.getItem(TIMER_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  }
+
+  let wakeLock = null;
+
+  async function acquireWakeLock(){
+    try{
+      if('wakeLock' in navigator){
+        wakeLock = await navigator.wakeLock.request('screen');
+      }
+    }catch(e){ /* wake lock unavailable/denied — timer still runs, screen may sleep */ }
+  }
+
+  function releaseWakeLock(){
+    try{ if(wakeLock){ wakeLock.release(); wakeLock = null; } }catch(e){}
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if(document.visibilityState === 'visible' && timerInterval){
+      acquireWakeLock();
+    }
+  });
+
+  function runTimer(label, endTime){
+    document.getElementById('timerIdle').style.display = 'none';
+    document.getElementById('timerDone').style.display = 'none';
+    document.getElementById('timerActive').style.display = 'block';
+    document.getElementById('timerRunningLabel').textContent = label;
+    acquireWakeLock();
+
+    clearInterval(timerInterval);
+    tick();
+    timerInterval = setInterval(tick, 1000);
+
+    function tick(){
+      const remaining = Math.max(0, endTime - Date.now());
+      const mm = Math.floor(remaining / 60000);
+      const ss = Math.floor((remaining % 60000) / 1000);
+      document.getElementById('timerClock').textContent =
+        String(mm).padStart(2,'0') + ':' + String(ss).padStart(2,'0');
+      if(remaining <= 0){
+        clearInterval(timerInterval);
+        timerDone(label);
+      }
+    }
+  }
+
+  function timerDone(label){
+    document.getElementById('timerActive').style.display = 'none';
+    document.getElementById('timerDone').style.display = 'block';
+    document.getElementById('timerDoneLabel').textContent = label;
+    saveTimer(null);
+    releaseWakeLock();
+
+    if('Notification' in window && Notification.permission === 'granted'){
+      try{
+        new Notification('Anar Manager', {
+          body: label + ' — time to switch the valve',
+          requireInteraction: true,
+          tag: 'anar-valve-alarm'
+        });
+      }catch(e){}
+    }
+    if('vibrate' in navigator){
+      try{ navigator.vibrate([400,150,400,150,400,150,400]); }catch(e){}
+    }
+
+    beep();
+    clearInterval(alarmInterval);
+    alarmInterval = setInterval(() => {
+      beep();
+      if('vibrate' in navigator){ try{ navigator.vibrate([400,150,400]); }catch(e){} }
+    }, 2000);
+  }
+
+  function dismissAlarm(){
+    clearInterval(alarmInterval);
+    if('vibrate' in navigator){ try{ navigator.vibrate(0); }catch(e){} }
+    document.getElementById('timerDone').style.display = 'none';
+    document.getElementById('timerIdle').style.display = 'block';
+  }
+
+  function stopTimer(){
+    clearInterval(timerInterval);
+    clearInterval(alarmInterval);
+    if('vibrate' in navigator){ try{ navigator.vibrate(0); }catch(e){} }
+    releaseWakeLock();
+    saveTimer(null);
+    document.getElementById('timerActive').style.display = 'none';
+    document.getElementById('timerDone').style.display = 'none';
+    document.getElementById('timerIdle').style.display = 'block';
+  }
+
+  // resume a timer that was running before the app was closed/reloaded
+  (function resumeTimer(){
+    const saved = loadTimer();
+    if(!saved) return;
+    if(saved.endTime <= Date.now()){
+      timerDone(saved.label);
+    }else{
+      runTimer(saved.label, saved.endTime);
+    }
+  })();
 
   // ---------- PWA: register service worker (only works when served, not on file://) ----------
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
