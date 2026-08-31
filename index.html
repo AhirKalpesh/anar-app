@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>Anar Manager — Pomegranate &amp; Drip Toolkit</title>
+<title>Anar Manager — Floating Bottom Pill Nav</title>
 
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#241d14">
@@ -16,19 +16,20 @@
 
 <style>
   :root{
-    --soil-dark:#241d14;
-    --soil:#2e2417;
-    --soil-light:#3c3020;
-    --parchment:#ece2c8;
-    --parchment-dim:#c9bd9c;
-    --seed-red:#c1442d;
-    --seed-red-deep:#8a2c1f;
-    --rind-maroon:#7a1f2b;
-    --leaf:#7c8c4f;
-    --leaf-dim:#5c6a3a;
-    --ochre:#c88a3d;
-    --line:#4a3d28;
-    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --body-text:#4a3a22;
+    --soil-dark:#fdf6ea;
+    --soil:#ffffff;
+    --soil-light:#fffaf1;
+    --parchment:#2b2013;
+    --parchment-dim:#8a7a5c;
+    --seed-red:#e0592f;
+    --seed-red-deep:#b6431f;
+    --rind-maroon:#a63a2c;
+    --leaf:#5f8c4a;
+    --leaf-dim:#3f6636;
+    --ochre:#c9852a;
+    --line:#e9dfc7;
+    --shadow: 0 8px 24px rgba(60,40,10,.10);
     --serif: Georgia, Cambria, "Times New Roman", serif;
     --sans: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --mono: "Courier New", Courier, monospace;
@@ -45,15 +46,15 @@
     -webkit-font-smoothing:antialiased;
     min-height:100vh;
   }
-  .wrap{max-width:880px;margin:0 auto;padding:0 18px 64px;}
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px 88px;}
 
   /* ---------- HEADER ---------- */
   header.top{
-    padding:34px 18px 22px;
+    padding:44px 24px 30px;
     border-bottom:1px solid var(--line);
     background:linear-gradient(180deg, rgba(122,31,43,.18), transparent);
   }
-  .crest{display:flex;align-items:center;gap:16px;max-width:880px;margin:0 auto;}
+  .crest{display:flex;align-items:center;gap:18px;max-width:960px;margin:0 auto;}
   .crest svg{flex:none;}
   .crest h1{
     font-family:var(--serif);
@@ -72,37 +73,37 @@
   }
   .offline-pill{
     display:inline-flex;align-items:center;gap:6px;
-    margin-top:14px;
+    margin-top:18px;
     font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;
     color:var(--leaf);
     border:1px solid var(--leaf-dim);
-    padding:5px 10px;border-radius:20px;
-    max-width:880px;
+    padding:6px 12px;border-radius:20px;
+    max-width:960px;
   }
   .offline-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--leaf);box-shadow:0 0 8px var(--leaf);}
 
   /* ---------- TABS ---------- */
   nav.tabs{
     position:sticky;top:0;z-index:20;
-    display:flex;gap:2px;
+    display:flex;gap:4px;
     background:var(--soil-dark);
     border-bottom:1px solid var(--line);
-    padding:0 18px;
+    padding:0 24px;
     overflow-x:auto;
   }
-  nav.tabs .inner{display:flex;gap:2px;max-width:880px;margin:0 auto;width:100%;}
+  nav.tabs .inner{display:flex;gap:4px;max-width:960px;margin:0 auto;width:100%;}
   .tab-btn{
     appearance:none;border:none;background:transparent;
     color:var(--parchment-dim);
     font-family:var(--sans);font-size:14.5px;font-weight:600;
-    padding:16px 16px 13px;
+    padding:18px 20px 15px;
     cursor:pointer;white-space:nowrap;
     border-bottom:3px solid transparent;
     transition:color .15s ease, border-color .15s ease;
   }
   .tab-btn:hover{color:var(--parchment);}
   .tab-btn.active{color:var(--ochre);border-bottom-color:var(--seed-red);}
-  .tab-panel{display:none;padding-top:26px;}
+  .tab-panel{display:none;padding-top:36px;}
   .tab-panel.active{display:block;animation:fadeUp .35s ease;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
@@ -110,23 +111,23 @@
   .card{
     background:linear-gradient(180deg, var(--soil-light), var(--soil));
     border:1px solid var(--line);
-    border-radius:10px;
-    padding:20px 20px 22px;
-    margin-bottom:18px;
+    border-radius:12px;
+    padding:28px 26px 30px;
+    margin-bottom:26px;
     box-shadow:var(--shadow);
   }
   .card h2{
     font-family:var(--serif);
-    font-size:20px;margin:0 0 4px;color:var(--parchment);
+    font-size:20px;margin:0 0 8px;color:var(--parchment);
     display:flex;align-items:baseline;gap:9px;
   }
   .card h2 .eyebrow{
     font-family:var(--mono);font-size:11px;color:var(--seed-red);
     letter-spacing:1px;
   }
-  .card .sub{color:var(--parchment-dim);font-size:13.5px;margin:0 0 16px;line-height:1.5;}
-  .card h3{font-family:var(--serif);font-size:15.5px;color:var(--ochre);margin:18px 0 8px;}
-  p, li{line-height:1.62;font-size:14.5px;color:#ddd3ba;}
+  .card .sub{color:var(--parchment-dim);font-size:13.5px;margin:0 0 22px;line-height:1.55;}
+  .card h3{font-family:var(--serif);font-size:15.5px;color:var(--ochre);margin:24px 0 10px;}
+  p, li{line-height:1.62;font-size:14.5px;color:var(--body-text, #ddd3ba);}
   ul{margin:6px 0;padding-left:20px;}
   li{margin-bottom:5px;}
   .note{
@@ -143,25 +144,25 @@
   table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;}
   th,td{padding:9px 8px;text-align:left;border-bottom:1px solid var(--line);}
   th{color:var(--ochre);font-weight:600;font-family:var(--sans);font-size:12px;text-transform:uppercase;letter-spacing:.4px;}
-  td{color:#ddd3ba;}
+  td{color:var(--body-text, #ddd3ba);}
   tr:last-child td{border-bottom:none;}
   .num{font-family:var(--mono);color:var(--parchment);}
 
   /* ---------- CALCULATOR ---------- */
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
   @media(max-width:520px){.grid2{grid-template-columns:1fr;}}
-  label{display:block;font-size:12px;color:var(--parchment-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+  label{display:block;font-size:12px;color:var(--parchment-dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
   select,input[type=number],input[type=text],input[type=date]{
     width:100%;background:var(--soil-dark);
     border:1px solid var(--line);color:var(--parchment);
-    padding:10px 11px;border-radius:6px;font-size:14.5px;font-family:var(--sans);
+    padding:12px 13px;border-radius:7px;font-size:14.5px;font-family:var(--sans);
   }
   select:focus,input:focus{outline:2px solid var(--seed-red);outline-offset:1px;}
-  .field{margin-bottom:14px;}
+  .field{margin-bottom:18px;}
   .calc-btn{
-    margin-top:6px;
+    margin-top:10px;
     background:var(--seed-red);color:#fff;border:none;
-    padding:12px 18px;border-radius:7px;font-weight:700;font-size:14.5px;
+    padding:14px 22px;border-radius:8px;font-weight:700;font-size:14.5px;
     cursor:pointer;letter-spacing:.3px;
     transition:background .15s ease, transform .1s ease;
   }
@@ -171,8 +172,8 @@
 
   /* result / gauge */
   .result{
-    margin-top:22px;padding-top:20px;border-top:1px dashed var(--line);
-    display:flex;gap:24px;align-items:center;flex-wrap:wrap;
+    margin-top:28px;padding-top:26px;border-top:1px dashed var(--line);
+    display:flex;gap:28px;align-items:center;flex-wrap:wrap;
   }
   .gauge-wrap{flex:none;text-align:center;}
   .gauge-wrap .g-label{font-size:11px;color:var(--parchment-dim);text-transform:uppercase;letter-spacing:.5px;margin-top:4px;}
@@ -183,8 +184,9 @@
   .stat-row .v{font-family:var(--mono);color:var(--ochre);font-weight:700;}
 
   /* ---------- LOG ---------- */
-  .log-form{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:10px;align-items:end;}
-  @media(max-width:680px){.log-form{grid-template-columns:1fr 1fr;}}
+  .log-form{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr 1fr;gap:14px;align-items:end;}
+  @media(max-width:920px){.log-form{grid-template-columns:1fr 1fr 1fr;}}
+  @media(max-width:520px){.log-form{grid-template-columns:1fr 1fr;}}
   .add-btn{
     background:var(--leaf);color:#1b1b10;border:none;font-weight:700;
     padding:10px 16px;border-radius:6px;cursor:pointer;height:41px;
@@ -195,13 +197,13 @@
   /* ---------- TIMER ---------- */
   .timer-clock{
     font-family:var(--mono);font-size:52px;color:var(--ochre);
-    text-align:center;letter-spacing:2px;margin-top:18px;font-weight:bold;
+    text-align:center;letter-spacing:2px;margin-top:22px;font-weight:bold;
   }
-  .timer-sub{text-align:center;color:var(--parchment-dim);font-size:13.5px;margin:2px 0 16px;}
+  .timer-sub{text-align:center;color:var(--parchment-dim);font-size:13.5px;margin:4px 0 20px;}
   #timerActive{text-align:center;}
   .timer-alert{
     background:rgba(193,68,45,.16);border:1px solid var(--seed-red);
-    border-radius:8px;padding:18px;text-align:center;margin-top:16px;
+    border-radius:9px;padding:22px;text-align:center;margin-top:20px;
     animation:pulse 1.4s ease-in-out infinite;
   }
   .timer-alert div{font-size:16.5px;margin-bottom:12px;color:var(--parchment);font-weight:700;}
@@ -227,6 +229,36 @@
   @media (prefers-reduced-motion: reduce){
     .tab-panel.active{animation:none;}
   }
+
+/* ---- STRUCTURAL MIX: floating bottom pill segmented nav ---- */
+nav.tabs{
+  position:fixed; top:auto; bottom:16px; left:50%;
+  transform:translateX(-50%);
+  width:calc(100% - 32px); max-width:460px;
+  background:var(--soil); border:1px solid var(--line);
+  border-radius:999px; padding:5px;
+  box-shadow:0 12px 30px rgba(40,25,10,.18);
+  z-index:30;
+}
+nav.tabs .inner{display:flex; gap:3px; width:100%; max-width:none; margin:0;}
+.tab-btn{
+  flex:1; text-align:center; border-radius:999px;
+  padding:11px 6px; border-bottom:none; font-size:12.5px;
+  transition:background .15s ease, color .15s ease;
+}
+.tab-btn.active{
+  background:var(--seed-red); color:#fff; font-weight:700;
+  border-bottom-color:transparent;
+}
+.wrap{padding-bottom:104px;}
+header.top{padding:26px 24px 18px;}
+.card h2{align-items:center;}
+.card h2 .eyebrow{
+  background:var(--seed-red); color:#fff; border-radius:6px;
+  padding:2px 7px; font-size:10px;
+}
+@media print{ nav.tabs{position:static; box-shadow:none;} }
+
 </style>
 </head>
 <body>
@@ -431,12 +463,20 @@
           <input type="date" id="logDate">
         </div>
         <div class="field" style="margin-bottom:0;">
-          <label for="logBlock">Block / plot</label>
+          <label for="logBlock">Block</label>
           <input type="text" id="logBlock" placeholder="e.g. North block">
         </div>
         <div class="field" style="margin-bottom:0;">
-          <label for="logValveTime">Valve &amp; duration</label>
-          <input type="text" id="logValveTime" placeholder="e.g. Valve 2, 45">
+          <label for="logPlot">Plot #</label>
+          <input type="text" id="logPlot" placeholder="e.g. 4">
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="logValve">Valve</label>
+          <input type="text" id="logValve" placeholder="e.g. Valve 2">
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="logDuration">Duration (min)</label>
+          <input type="number" id="logDuration" min="1" step="1" placeholder="e.g. 45">
         </div>
         <div class="field" style="margin-bottom:0;">
           <label for="logVolume">Volume (L)</label>
@@ -606,38 +646,24 @@
     reader.readAsText(file);
   }
 
-  // Parses combined input like "Valve 2, 45" or "Valve 2, 45 min" or "Valve 2 45"
-  function parseValveDuration(raw){
-    if(!raw) return {valve:'', minutes:NaN};
-    raw = raw.trim();
-    if(raw.includes(',')){
-      const idx = raw.indexOf(',');
-      const valve = raw.slice(0, idx).trim();
-      const rest = raw.slice(idx + 1);
-      const m = rest.match(/(-?\d+(\.\d+)?)/);
-      return {valve, minutes: m ? parseFloat(m[1]) : NaN};
-    }
-    const m = raw.match(/^(.*?)[\s]+(-?\d+(\.\d+)?)\s*(min|minutes|m)?\s*$/i);
-    if(m) return {valve: m[1].trim(), minutes: parseFloat(m[2])};
-    return {valve: raw, minutes: NaN};
-  }
-
   let lastRun = null;
 
   function startAndLog(){
     const date = document.getElementById('logDate').value;
     const block = document.getElementById('logBlock').value.trim();
+    const plot = document.getElementById('logPlot').value.trim();
     const volumeRaw = document.getElementById('logVolume').value;
-    const { valve, minutes } = parseValveDuration(document.getElementById('logValveTime').value);
+    const valve = document.getElementById('logValve').value.trim();
+    const minutes = parseFloat(document.getElementById('logDuration').value);
 
     if(!date || !block || !valve || isNaN(minutes) || minutes <= 0){
-      alert('Fill in date, block, and "Valve, duration" (e.g. "Valve 2, 45") before starting.');
+      alert('Fill in date, block, valve, and duration before starting.');
       return;
     }
 
     // log the entry
     logEntries.push({
-      date, block, valve,
+      date, block, plot, valve,
       minutes,
       volume: volumeRaw ? parseFloat(volumeRaw) : null
     });
@@ -645,10 +671,10 @@
     renderLog();
 
     // remember this run so it can be restarted with one tap later
-    lastRun = { block, valve, minutes, volumeRaw };
+    lastRun = { block, plot, valve, minutes, volumeRaw };
 
     // start the countdown for the same run
-    const label = block + (valve ? ' – ' + valve : '');
+    const label = block + (plot ? ' (Plot ' + plot + ')' : '') + (valve ? ' – ' + valve : '');
     if('Notification' in window && Notification.permission === 'default'){
       Notification.requestPermission().then(() => { if(typeof renderNotifRow==='function') renderNotifRow(); });
     }
@@ -658,7 +684,9 @@
 
     // clear the entry fields, keep date as-is for the next run
     document.getElementById('logBlock').value = '';
-    document.getElementById('logValveTime').value = '';
+    document.getElementById('logPlot').value = '';
+    document.getElementById('logValve').value = '';
+    document.getElementById('logDuration').value = '';
     document.getElementById('logVolume').value = '';
   }
 
@@ -669,7 +697,9 @@
     }
     document.getElementById('logDate').valueAsDate = new Date();
     document.getElementById('logBlock').value = lastRun.block;
-    document.getElementById('logValveTime').value = lastRun.valve + ', ' + lastRun.minutes;
+    document.getElementById('logPlot').value = lastRun.plot || '';
+    document.getElementById('logValve').value = lastRun.valve;
+    document.getElementById('logDuration').value = lastRun.minutes;
     document.getElementById('logVolume').value = lastRun.volumeRaw || '';
     startAndLog();
   }
@@ -707,6 +737,7 @@
       return `<tr>
         <td>${e.date}</td>
         <td>${e.block}</td>
+        <td>${e.plot || '—'}</td>
         <td>${e.valve || '—'}</td>
         <td class="num">${e.minutes} min</td>
         <td class="num">${e.volume != null ? e.volume + ' L' : '—'}</td>
@@ -715,10 +746,10 @@
     }).join('');
 
     wrap.innerHTML = `<table>
-      <tr><th>Date</th><th>Block</th><th>Valve</th><th>Duration</th><th>Volume</th><th></th></tr>
+      <tr><th>Date</th><th>Block</th><th>Plot</th><th>Valve</th><th>Duration</th><th>Volume</th><th></th></tr>
       ${rows}
       <tr>
-        <td colspan="3" style="color:var(--ochre);font-weight:700;">Total logged</td>
+        <td colspan="4" style="color:var(--ochre);font-weight:700;">Total logged</td>
         <td class="num" style="color:var(--ochre);font-weight:700;">${totalMin} min</td>
         <td class="num" style="color:var(--ochre);font-weight:700;">${totalVol ? totalVol + ' L' : '—'}</td>
         <td></td>
